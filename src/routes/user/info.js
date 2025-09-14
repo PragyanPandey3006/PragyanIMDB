@@ -1,7 +1,7 @@
 import { parse } from 'node-html-parser';
 
-export default async function userInfo(req, env, ctx, params) {
-  const userId = params.id;
+export default async function userInfo(req) {
+  const userId = req.params.id;
   try {
     const response = await fetch(`https://www.imdb.com/user/${userId}`, {
       headers: {
@@ -12,7 +12,15 @@ export default async function userInfo(req, env, ctx, params) {
     });
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
+      return new Response(JSON.stringify({ message: "User not found" }), { 
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': '*'
+        }
+      });
     }
 
     const rawHtml = await response.text();
@@ -46,6 +54,14 @@ export default async function userInfo(req, env, ctx, params) {
 
     return Response.json(data);
   } catch (error) {
-    return new Response(JSON.stringify({ message: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ message: error.message }), { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+      }
+    });
   }
 }

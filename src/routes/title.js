@@ -20,7 +20,15 @@ export default async function title(req) {
       const result = await getTitle(id);
       return Response.json(result);
     } catch (error) {
-      return new Response(JSON.stringify({ message: error.message }), { status: 500 });
+      return new Response(JSON.stringify({ message: error.message }), { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': '*'
+        }
+      });
     }
   }
   

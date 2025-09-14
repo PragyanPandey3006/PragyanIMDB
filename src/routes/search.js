@@ -5,7 +5,15 @@ export default async function search(req) {
   const query = url.searchParams.get("query");
 
   if (!query) {
-    return new Response(JSON.stringify({ message: "Query param is required" }), { status: 400 });
+    return new Response(JSON.stringify({ message: "Query param is required" }), { 
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+      }
+    });
   }
 
   try {
@@ -59,6 +67,14 @@ export default async function search(req) {
       query: null,
       results: [],
       message: errorMessage,
-    }), { status: 500 });
+    }), { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+      }
+    });
   }
 }

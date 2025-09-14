@@ -9,9 +9,9 @@ const optionsMapper = [
   { key: "userRating", name: "rating" }
 ];
 
-export default async function reviews(req, env, ctx, params) {
+export default async function reviews(req) {
   try {
-    const id = params.id;
+    const id = req.params.id;
     const url = new URL(req.url);
     const optionParam = url.searchParams.get("option");
     const sortOrder = url.searchParams.get("sortOrder") === "asc" ? "asc" : "desc";
@@ -43,13 +43,13 @@ export default async function reviews(req, env, ctx, params) {
         review.date = dateNode ? new Date(dateNode.text.trim()).toISOString() : null;
 
         const starsText = node.querySelector(".ipl-ratings-bar")?.textContent;
-        review.stars = starsText ? parseInt(starsText.match(/\\d+/)?.[0] || "0") : 0;
+        review.stars = starsText ? parseInt(starsText.match(/\d+/)?.[0] || "0") : 0;
 
         review.heading = decode(node.querySelector(".title")?.text?.trim() ?? "");
         review.content = decode(node.querySelector(".text")?.text?.trim() ?? "");
 
         const helpfulText = node.querySelector(".actions")?.textContent?.trim() ?? "";
-        const [helpfulVotes, totalVotes] = helpfulText.match(/\\d+/g) || [0, 0];
+        const [helpfulVotes, totalVotes] = helpfulText.match(/\d+/g) || [0, 0];
         review.helpfulNess = {
           votes: parseInt(totalVotes),
           votedAsHelpful: parseInt(helpfulVotes),
@@ -82,6 +82,14 @@ export default async function reviews(req, env, ctx, params) {
 
     return Response.json(result);
   } catch (error) {
-    return new Response(JSON.stringify({ message: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ message: error.message }), { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+      }
+    });
   }
 }

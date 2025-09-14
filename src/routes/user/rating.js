@@ -8,8 +8,8 @@ const SORT_OPTIONS = {
   worst_rated: "your_rating,asc"
 };
 
-export default async function userRating(req, env, ctx, params) {
-  const userId = params.id;
+export default async function userRating(req) {
+  const userId = req.params.id;
   const url = new URL(req.url);
   const sortParam = url.searchParams.get("sort");
   const ratingFilter = url.searchParams.get("ratingFilter");
@@ -79,7 +79,15 @@ export default async function userRating(req, env, ctx, params) {
       ratings: all_ratings
     });
   } catch (error) {
-    return new Response(JSON.stringify({ message: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ message: error.message }), { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+      }
+    });
   }
 }
 

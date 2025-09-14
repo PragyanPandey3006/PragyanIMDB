@@ -4,6 +4,11 @@ export default async function index() {
     name: "imdb-api",
     version: "1.0.0"
   }), {
-    headers: { "Content-Type": "application/json" }
+    headers: { 
+      "Content-Type": "application/json",
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': '*'
+    }
   });
 }

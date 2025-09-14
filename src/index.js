@@ -19,6 +19,12 @@ router.all('*', (req) => {
       }
     });
   }
+  // Add CORS headers to all responses
+  req.corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': '*'
+  };
 });
 
 // Routes
@@ -34,7 +40,12 @@ router.get('/user/:id/ratings', userRoutes.ratings);
 router.all('*', () =>
   new Response(JSON.stringify({ error: 'Not Found' }), {
     status: 404,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': '*'
+    }
   })
 );
 
@@ -54,6 +65,17 @@ export default {
 
     try {
       const response = await router.handle(request, env, ctx);
+      
+      // Add CORS headers to all responses
+      const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': '*'
+      };
+      
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
 
       if (
         !isCacheDisabled &&
@@ -62,6 +84,9 @@ export default {
       ) {
         const cachedResponse = new Response(response.body, response);
         cachedResponse.headers.set('Cache-Control', 's-maxage=600');
+        Object.entries(corsHeaders).forEach(([key, value]) => {
+          cachedResponse.headers.set(key, value);
+        });
         ctx.waitUntil(cache.put(cacheKey, cachedResponse.clone()));
         return cachedResponse;
       }
@@ -71,7 +96,12 @@ export default {
       console.error("Unhandled Worker Error:", err);
       return new Response(JSON.stringify({ error: "Internal error", details: err.message }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': '*'
+        }
       });
     }
   }
